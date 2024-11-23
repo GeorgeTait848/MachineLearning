@@ -2,6 +2,8 @@ import pandas as pd
   
 import numpy as np 
 
+from scipy import stats as st
+
 # Define the class
 
 class K_Nearest_Neighbours_Classifier():
@@ -45,6 +47,10 @@ class K_Nearest_Neighbours_Classifier():
             Neighbours = np.zeros(self.K)
 
             Neighbours = self.Find_Nearest_Neighbours(x)
+
+            # Now Classify
+            self.Y_predict[i] = st.mode(Neighbours)[0][0]  
+
 
     # Function to find the nearest neighbours
 
