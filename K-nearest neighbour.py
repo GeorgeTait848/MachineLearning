@@ -4,37 +4,30 @@ import numpy as np
 
 from scipy import stats as st
 
-# Define the class
+# Define the k-nearest neighbours class
 
-class K_Nearest_Neighbours_Classifier():
+class KNN_Classifier():
   
-    # Function to define K the number of Nearest neighbours required for classification
-    def __init__(self, K):
+    # Function to define k the number of Nearest neighbours required for classification
+    def __init__(self, k, X_train, Y_train):
+        self.k = k
 
-        self.K = K
-    
-    # Function to store the data set ("train"... not really)
-
-    def Training_Data(self, X_train, Y_train):
-        
+        #store trainging data
         self.X_train = X_train
         self.Y_train = Y_train
 
-        # Define number of training samples (m) and number of features (n)
-        self.m, self.n = X_train.shape
-    
-    # Function to predict the classification
+        # Define number of training samples and number of features
+        self.num_samples, self.num_features = X_train.shape
 
-    def prediction(self, X_test):
+    def predict_classification(self, X_test):
 
         # Define the test data
         self.X_test = X_test
 
-        # Define number of testing samples and number (m_test) and number of testing features (n_test)
-        self.m_test, self.n_test = X_test.shape
+        self.num_test_samples, self.num_test_features = X_test.shape
 
         #initialize the Y prediction array
-        self.Y_predict = np.zeros(self.m_test)
+        self.Y_predictions = np.zeros(self.m_test)
 
         # make predictions
 
@@ -44,37 +37,37 @@ class K_Nearest_Neighbours_Classifier():
             x = self.X_test[i]
 
             # find the nearest neighbours of this test data point, first define the nearest neighbours array
-            Neighbours = np.zeros(self.K)
+            neighbours = np.zeros(self.k)
 
-            Neighbours = self.Find_Nearest_Neighbours(x)
-
+            neighbours = self.find_nearest_neighbours(x)
+    
             # Now Classify
-            self.Y_predict[i] = st.mode(Neighbours)[0][0]  
+            self.Y_predictions[i] = st.mode(neighbours)[0][0]  
 
 
     # Function to find the nearest neighbours
 
-    def Find_Nearest_Neighbours(self, x):
+    def find_nearest_neighbours(self, x):
         
         # define the distances array
-        Euclidean_Distances = np.zeros(self.m)
+        euclidean_distances = np.zeros(self.num_samples)
         
-        for i in range(self.m):
+        for i in range(self.num_samples):
 
             # Add distances to the array at index o
-            Euclidean_Distances[i] = self.Calculate_Euclidean_Distance(x, self.X_test[i])
+            euclidean_distances[i] = self.calculate_euclidean_distance(x, self.X_test[i])
 
         # sort the above algorithm in increasing order using .argsort(). This returns the indices of the sorted algorithm
 
-        Sorted_indices = Euclidean_Distances.argsort()
+        sorted_indices = euclidean_distances.argsort()
 
-        Y_train_sorted = self.Y_train[Sorted_indices]
+        Y_train_sorted = self.Y_train[sorted_indices]
 
-        return Y_train_sorted[:self.K]
+        return Y_train_sorted[:self.k]
     
     # Function to calculate the Euclidean Distance between two input points
 
-    def Calculate_Euclidean_Distance(self, x, X_train):
+    def calculate_euclidean_distance(self, x, X_train):
         
         # Implementation of the Euclidean Distance Equation.
         return np.sqrt( np.sum( np.square(x - X_train) ) )
