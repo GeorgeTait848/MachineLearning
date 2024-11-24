@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np 
 
 from scipy import stats as st
-
+import data
 # Define the k-nearest neighbours class
 
 class KNN_Classifier():
@@ -40,7 +40,7 @@ class KNN_Classifier():
             neighbours = np.zeros(self.k)
 
             neighbours = self.find_nearest_neighbours(x)
-    
+
             # Now Classify
             self.Y_predictions[i] = st.mode(neighbours)[0][0]  
         return self.Y_predictions
