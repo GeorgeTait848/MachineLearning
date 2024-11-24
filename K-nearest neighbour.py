@@ -43,7 +43,7 @@ class KNN_Classifier():
     
             # Now Classify
             self.Y_predictions[i] = st.mode(neighbours)[0][0]  
-
+        return self.Y_predictions
 
     # Function to find the nearest neighbours
 
@@ -55,7 +55,7 @@ class KNN_Classifier():
         for i in range(self.num_samples):
 
             # Add distances to the array at index o
-            euclidean_distances[i] = self.calculate_euclidean_distance(x, self.X_test[i])
+            euclidean_distances[i] = self.calculate_euclidean_distance(x, self.X_train[i])
 
         # sort the above algorithm in increasing order using .argsort(). This returns the indices of the sorted algorithm
 
