@@ -28,8 +28,8 @@ def split_dataset(df: DataFrame, train_frac = 0.6, valid_frac = 0.2, test_frac =
     valid_split_point = int((train_frac + valid_frac)*df_len)
 
     training_data, validation_data, test_data = np.split(df.sample(frac=1), [train_split_point, valid_split_point])
-
-    return DataFrame(training_data, columns=df.columns.values), DataFrame(validation_data, columns=df.columns.values), DataFrame(test_data, columns=df.columns.values)
+    
+    return training_data, validation_data, test_data
 
 
 def oversample_data(features: np.ndarray, outcomes: np.ndarray):
@@ -39,11 +39,18 @@ def oversample_data(features: np.ndarray, outcomes: np.ndarray):
 
     return oversampled_features, oversampled_outcomes
 
-def scale_dataset(df: DataFrame, oversample = False) -> DataFrame:
-    '''Scales values around mean value for each feature using StandardScaler from scikit-learn'''
+
+def separate_features_outcomes(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
 
     features = df[df.columns[:-1]].values
     outcomes = df[df.columns[-1]].values
+
+    return features, outcomes
+
+def scale_dataset(df: DataFrame, oversample = False) -> DataFrame:
+    '''Scales values around mean value for each feature using StandardScaler from scikit-learn'''
+
+    features, outcomes = separate_features_outcomes(df)
 
     scaler = StandardScaler()
 
@@ -52,13 +59,13 @@ def scale_dataset(df: DataFrame, oversample = False) -> DataFrame:
     if oversample: 
         oversampled_features, oversampled_outcomes = oversample_data(features, outcomes)
         oversampled_dat = np.hstack((oversampled_features, np.reshape(oversampled_outcomes, (-1, 1))))
-        return DataFrame(oversampled_dat, columns=df.columns.values)
+        return DataFrame(oversampled_dat, columns = df.columns.values)
 
 
     dat = np.hstack((features, np.reshape(outcomes, (-1,1))))
     return DataFrame(dat, columns=df.columns.values)
 
-def get_prepared_data():
+def get_prepared_MEGA_data() -> tuple[DataFrame, DataFrame, DataFrame]:
 
     df = fetch_MEGA_dataset()
     train, valid, test = split_dataset(df)
@@ -70,12 +77,7 @@ def get_prepared_data():
     return training_data, validation_data, testing_data
 
 
-def separate_features_outcomes(df: pd.DataFrame):
 
-    features = df[df.columns[:-1]].values
-    outcomes = df[df.columns[-1]].values
-
-    return features, outcomes
 
 def plot_MEGA_data_normalised_histogram(): 
     '''Plotting the different features as normalised histograms for Gamma particles and Hadrons'''
@@ -94,10 +96,21 @@ def plot_MEGA_data_normalised_histogram():
 
 
 def main():
-    train, valid, test = get_prepared_data()
-    print(train)
-    print(len(train[train["isGamma"]==1]))
-    print(len(train[train["isGamma"]==0]))
+    
+    df = fetch_MEGA_dataset()
+    train, _, _ = split_dataset(df=df)
+    scaled_oversampled_data = scale_dataset(train, oversample=True)
+
+    #Check that the oversampling has worked, these two values should be equal. 
+    print(len(scaled_oversampled_data[scaled_oversampled_data["isGamma"]==1]))
+    print(len(scaled_oversampled_data[scaled_oversampled_data["isGamma"]==0]))
+
+
+    # train, valid, test = get_prepared_data()
+    
+    # print(train)
+    # print(len(train[train["isGamma"]==1]))
+    # print(len(train[train["isGamma"]==0]))
     
 
 
